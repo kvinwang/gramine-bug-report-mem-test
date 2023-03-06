@@ -1,0 +1,43 @@
+[libos]
+entrypoint = "{{ name }}"
+
+[loader]
+preload = "file:{{ gramine.libos }}" # for compatibility with v1.0
+entrypoint = "file:{{ gramine.libos }}"
+log_level = "error"
+argv0_override = "{{ name }}"
+
+[loader.env]
+LD_LIBRARY_PATH = "/lib:/lib/x86_64-linux-gnu"
+
+[[fs.mounts]]
+type = "chroot"
+path = "/lib"
+uri = "file:{{ gramine.runtimedir() }}"
+
+[[fs.mounts]]
+type = "chroot"
+path = "/lib/x86_64-linux-gnu"
+uri = "file:/lib/x86_64-linux-gnu"
+
+[[fs.mounts]]
+type = "chroot"
+path = "/etc"
+uri = "file:/etc"
+
+[sgx]
+debug = true
+nonpie_binary = true
+enclave_size = "1G"
+thread_num = 16
+
+trusted_files = [
+  "file:{{ gramine.libos }}",
+  "file:{{ name }}",
+  "file:{{ gramine.runtimedir() }}/",
+  "file:/lib/x86_64-linux-gnu/",
+]
+
+[sys]
+insecure__allow_eventfd = true
+
